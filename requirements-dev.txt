@@ -1,0 +1,18 @@
+# SQLTrans Development Dependencies
+-r requirements.txt
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Type checking
+mypy>=1.7.0
+
+# Code quality
+black>=23.11.0
+ruff>=0.1.6
+
+# Packaging
+pyinstaller>=6.3.0
+build>=1.0.0
+twine>=4.0.0

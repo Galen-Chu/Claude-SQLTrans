@@ -1,0 +1,5 @@
+# SQLTrans Runtime Dependencies
+textual>=0.47.0
+rich>=13.7.0
+pyperclip>=1.8.2
+tomli>=2.0.1; python_version<'3.11'
