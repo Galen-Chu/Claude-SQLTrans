@@ -4,15 +4,20 @@ Interactive SQL query builder for customer support engineers.
 
 ## Overview
 
-SQLTrans is a command-line tool with an interactive terminal interface that helps support teams quickly construct SQL queries for troubleshooting customer database issues. Build SELECT queries with WHERE clauses for PostgreSQL, Oracle, and generic SQL without memorizing syntax.
+SQLTrans is a versatile query building tool that helps support teams quickly construct SQL queries for troubleshooting customer database issues. Build SELECT queries with WHERE clauses for PostgreSQL, Oracle, and generic SQL without memorizing syntax.
+
+Choose between **Terminal UI (TUI)** for power users or **Web GUI** for a modern browser-based experience.
 
 ## Features
 
-- 🎯 **Interactive Terminal UI**: Visual interface for building queries
+- 🌐 **Dual Interface Modes**: Choose Terminal UI or Web GUI
+- 🎯 **Interactive Query Building**: Visual interface for constructing queries
 - 🗄️ **Multi-Database Support**: PostgreSQL, Oracle SQL, and generic ANSI SQL
-- 🔍 **Query Builder**: Construct SELECT queries with WHERE clause filtering
-- ✅ **Syntax Validation**: Ensures generated SQL is correct for target database
-- 📋 **Quick Export**: Copy to clipboard or save to file
+- 🔍 **Smart Query Builder**: Construct SELECT queries with WHERE clause filtering
+- ✅ **Real-time Validation**: Ensures generated SQL is correct for target database
+- 🎨 **Syntax Highlighting**: Color-coded SQL preview
+- 📋 **Quick Export**: Copy to clipboard or download to file
+- 🚀 **Zero Configuration**: Works out of the box, no setup required
 
 ## Installation
 
@@ -38,13 +43,23 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
-Launch the interactive query builder:
+### Web GUI Mode (Browser-Based)
+
+Launch the web interface (opens automatically in your default browser):
 
 ```bash
-sqltrans
+sqltrans --gui
 ```
 
-Or specify a default dialect:
+### Terminal UI Mode (Command-Line)
+
+Launch the terminal interface:
+
+```bash
+sqltrans --tui
+```
+
+Or use default mode (TUI) with a specific dialect:
 
 ```bash
 sqltrans --dialect postgresql
@@ -83,6 +98,14 @@ MIT License - see LICENSE file for details
 
 ## Project Status
 
-🚧 **Phase 1 Development** - Core query builder features in progress
+✅ **Phase 1 Complete** - Terminal UI query builder
+✅ **Phase 2 Complete** - Web GUI mode
 
-See `.spec-workflow/specs/phase1-query-builder/` for detailed specifications.
+See `.spec-workflow/specs/` for detailed specifications and roadmap.
+
+## Documentation
+
+- **[Quick Start Guide](QUICK_START.md)** - Get started in 5 minutes
+- **[Tutorial](TUTORIAL.md)** - Step-by-step examples and exercises
+- **[Documentation Index](DOCUMENTATION_INDEX.md)** - Complete documentation overview
+- **[Visual Walkthrough](VISUAL_WALKTHROUGH.md)** - Screenshots and UI guide

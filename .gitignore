@@ -143,3 +143,27 @@ Thumbs.db
 config.toml
 logs/
 *.sql
+
+# Development and testing files
+demo_*.py
+test_*.py
+check_*.py
+verify_*.py
+simple_mode.py
+compact_mode.py
+*.bat
+*.ps1
+
+# Development documentation (drafts/reports)
+*_REPORT.md
+*_TROUBLESHOOTING.md
+*_DESIGN.md
+*_GUIDE.md
+FIX_*.md
+EXECUTION_REPORT.md
+
+# Claude Code workspace
+.claude/
+
+# Experimental features
+src/sqltrans/ui/screens/compact_query_builder.py
