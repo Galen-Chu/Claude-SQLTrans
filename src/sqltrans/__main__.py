@@ -35,6 +35,19 @@ def main() -> None:
         epilog="Build SQL queries with validation and syntax highlighting",
     )
 
+    # Mode selection
+    mode_group = parser.add_mutually_exclusive_group()
+    mode_group.add_argument(
+        "--gui",
+        action="store_true",
+        help="Launch web GUI mode in browser (default: TUI)",
+    )
+    mode_group.add_argument(
+        "--tui",
+        action="store_true",
+        help="Launch terminal UI mode (default)",
+    )
+
     parser.add_argument(
         "--dialect",
         "-d",
@@ -74,12 +87,22 @@ def main() -> None:
             logger.debug(f"Could not load config: {e}, using default dialect")
             pass
 
-    # Launch the application
+    # Launch the application in selected mode
     try:
-        logger.info("Launching TUI application")
-        app = SQLTransApp(initial_dialect=initial_dialect)
-        app.run()
-        logger.info("Application exited normally")
+        if args.gui:
+            # Launch web GUI mode
+            logger.info("Launching Web GUI mode")
+            from sqltrans.web.launcher import launch_web_gui
+
+            launch_web_gui(initial_dialect=initial_dialect)
+        else:
+            # Launch TUI mode (default)
+            logger.info("Launching TUI mode")
+            from sqltrans.ui.app import SQLTransApp
+
+            app = SQLTransApp(initial_dialect=initial_dialect)
+            app.run()
+            logger.info("Application exited normally")
     except KeyboardInterrupt:
         # Clean exit on Ctrl+C
         logger.info("Application interrupted by user")

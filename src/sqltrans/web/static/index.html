@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQLTrans - Interactive SQL Query Builder</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/prism.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>
+                    <svg class="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 7h16M4 12h16M4 17h16"/>
+                    </svg>
+                    SQLTrans Query Builder
+                </h1>
+                <div class="header-controls">
+                    <label for="dialect-select">Dialect:</label>
+                    <select id="dialect-select" class="dialect-selector">
+                        <option value="generic">Generic SQL</option>
+                        <option value="postgresql">PostgreSQL</option>
+                        <option value="oracle">Oracle</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel: Query Builder -->
+            <aside class="query-builder">
+                <!-- Table Section -->
+                <section class="section">
+                    <h2>Table</h2>
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="table-input" 
+                            placeholder="Enter table name..."
+                            autocomplete="off"
+                        >
+                    </div>
+                    <span class="validation-message" id="table-error"></span>
+                </section>
+
+                <!-- Columns Section -->
+                <section class="section">
+                    <h2>Columns</h2>
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="column-input" 
+                            placeholder="Column name..."
+                            autocomplete="off"
+                        >
+                        <button id="add-column-btn" class="btn btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            Add
+                        </button>
+                    </div>
+                    <ul id="column-list" class="item-list"></ul>
+                    <p class="help-text">Leave empty for SELECT *</p>
+                </section>
+
+                <!-- Filters Section -->
+                <section class="section">
+                    <h2>Filters (WHERE)</h2>
+                    <div class="filter-form">
+                        <input 
+                            type="text" 
+                            id="filter-column" 
+                            placeholder="Column"
+                            autocomplete="off"
+                        >
+                        <select id="filter-operator">
+                            <option value="=">= (equals)</option>
+                            <option value="!=">!= (not equals)</option>
+                            <option value="<">< (less than)</option>
+                            <option value=">"> > (greater than)</option>
+                            <option value="<="><= (less or equal)</option>
+                            <option value=">=">= (greater or equal)</option>
+                            <option value="LIKE">LIKE (pattern)</option>
+                            <option value="IN">IN (list)</option>
+                            <option value="IS NULL">IS NULL</option>
+                            <option value="IS NOT NULL">IS NOT NULL</option>
+                        </select>
+                        <input 
+                            type="text" 
+                            id="filter-value" 
+                            placeholder="Value"
+                            autocomplete="off"
+                        >
+                        <button id="add-filter-btn" class="btn btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            Add
+                        </button>
+                    </div>
+                    <ul id="filter-list" class="item-list"></ul>
+                </section>
+
+                <!-- Actions Section -->
+                <section class="section actions-section">
+                    <button id="clear-query-btn" class="btn btn-outline">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m3 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6h14z"/>
+                        </svg>
+                        Clear Query
+                    </button>
+                </section>
+            </aside>
+
+            <!-- Right Panel: SQL Preview -->
+            <section class="sql-panel">
+                <div class="panel-header">
+                    <h2>Generated SQL</h2>
+                    <div class="panel-actions">
+                        <button id="copy-btn" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                            </svg>
+                            Copy
+                        </button>
+                        <button id="download-btn" class="btn btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                            </svg>
+                            Download
+                        </button>
+                    </div>
+                </div>
+                <div class="sql-display-container">
+                    <pre id="sql-preview" class="sql-display"><code class="language-sql">-- Build your query using the form on the left
+-- Start by entering a table name</code></pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="/static/lib/prism.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

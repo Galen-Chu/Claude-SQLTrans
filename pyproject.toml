@@ -36,6 +36,8 @@ dependencies = [
     "rich>=13.7.0",
     "pyperclip>=1.8.2",
     "tomli>=2.0.1; python_version<'3.11'",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
 ]
 
 [project.optional-dependencies]
@@ -76,7 +78,6 @@ addopts = [
 markers = [
     "asyncio: mark test as an asyncio test",
 ]
-asyncio_mode = "auto"
 
 [tool.coverage.run]
 source = ["src/sqltrans"]
