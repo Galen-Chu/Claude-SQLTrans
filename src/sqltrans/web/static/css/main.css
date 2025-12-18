@@ -1,50 +1,7 @@
 /* SQLTrans Web GUI - Main Stylesheet */
 
-/* CSS Variables */
-:root {
-    /* Colors */
-    --primary-color: #2563eb;
-    --primary-hover: #1d4ed8;
-    --secondary-color: #64748b;
-    --secondary-hover: #475569;
-    --success-color: #10b981;
-    --error-color: #ef4444;
-    --warning-color: #f59e0b;
-
-    /* Backgrounds */
-    --bg-app: #f8fafc;
-    --bg-surface: #ffffff;
-    --bg-header: #1e293b;
-    --bg-code: #1e293b;
-    --bg-hover: #f1f5f9;
-
-    /* Text */
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-on-dark: #f1f5f9;
-    --text-code: #e2e8f0;
-
-    /* Borders */
-    --border-color: #e2e8f0;
-    --border-radius: 8px;
-    --border-radius-sm: 4px;
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-
-    /* Spacing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-
-    /* Typography */
-    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
-}
+/* Note: CSS variables are defined in themes.css
+     This file uses standardized theme variables from themes.css */
 
 /* Reset and Base Styles */
 * {
@@ -57,8 +14,8 @@ body {
     font-family: var(--font-family);
     font-size: 14px;
     line-height: 1.6;
-    color: var(--text-primary);
-    background: var(--bg-app);
+    color: var(--color-text-primary);
+    background: var(--color-bg-primary);
     overflow: hidden;
 }
 
@@ -71,10 +28,10 @@ body {
 
 /* Header */
 .header {
-    background: var(--bg-header);
-    color: var(--text-on-dark);
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
     padding: var(--spacing-md) var(--spacing-xl);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--color-shadow-md);
     z-index: 100;
 }
 
@@ -114,7 +71,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius-sm);
     background: rgba(255, 255, 255, 0.1);
-    color: var(--text-on-dark);
+    color: var(--color-text-inverse);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s;
@@ -125,7 +82,7 @@ body {
 }
 
 .dialect-selector:focus {
-    outline: 2px solid var(--primary-color);
+    outline: 2px solid var(--color-accent-primary);
     outline-offset: 2px;
 }
 
@@ -143,8 +100,8 @@ body {
 
 /* Query Builder Panel */
 .query-builder {
-    background: var(--bg-surface);
-    border-right: 1px solid var(--border-color);
+    background: var(--color-bg-secondary);
+    border-right: 1px solid var(--color-border-primary);
     overflow-y: auto;
     padding: var(--spacing-lg);
     display: flex;
@@ -153,11 +110,11 @@ body {
 }
 
 .section {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
     border-radius: var(--border-radius);
     padding: var(--spacing-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--color-shadow-sm);
 }
 
 .section h2 {
@@ -172,7 +129,7 @@ input[type="text"],
 select {
     width: 100%;
     padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-border-primary);
     border-radius: var(--border-radius-sm);
     font-size: 14px;
     font-family: var(--font-family);
@@ -182,12 +139,12 @@ select {
 input[type="text"]:focus,
 select:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: var(--color-accent-primary);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 input[type="text"]::placeholder {
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
 }
 
 .input-group {
@@ -235,35 +192,35 @@ input[type="text"]::placeholder {
 }
 
 .btn-primary {
-    background: var(--primary-color);
+    background: var(--color-accent-primary);
     color: white;
 }
 
 .btn-primary:hover {
-    background: var(--primary-hover);
+    background: var(--color-accent-hover);
 }
 
 .btn-secondary {
-    background: var(--secondary-color);
+    background: var(--color-button-secondary);
     color: white;
 }
 
 .btn-secondary:hover {
-    background: var(--secondary-hover);
+    background: var(--color-button-secondary-hover);
 }
 
 .btn-outline {
     background: transparent;
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-border-primary);
 }
 
 .btn-outline:hover {
-    background: var(--bg-hover);
+    background: var(--color-bg-tertiary);
 }
 
 .btn-danger {
-    background: var(--error-color);
+    background: var(--color-error);
     color: white;
 }
 
@@ -290,13 +247,13 @@ input[type="text"]::placeholder {
     justify-content: space-between;
     align-items: center;
     padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--bg-hover);
-    border: 1px solid var(--border-color);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border-primary);
     border-radius: var(--border-radius-sm);
 }
 
 .item-list li:hover {
-    background: #e2e8f0;
+    background: var(--color-bg-tertiary);
 }
 
 .item-content {
@@ -309,7 +266,7 @@ input[type="text"]::placeholder {
     padding: var(--spacing-xs) var(--spacing-sm);
     background: transparent;
     border: none;
-    color: var(--error-color);
+    color: var(--color-error);
     cursor: pointer;
     border-radius: var(--border-radius-sm);
     transition: all 0.2s;
@@ -322,7 +279,7 @@ input[type="text"]::placeholder {
 /* Help Text */
 .help-text {
     font-size: 12px;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
     margin-top: var(--spacing-sm);
     font-style: italic;
 }
@@ -331,7 +288,7 @@ input[type="text"]::placeholder {
 .validation-message {
     display: block;
     font-size: 12px;
-    color: var(--error-color);
+    color: var(--color-error);
     margin-top: var(--spacing-sm);
     min-height: 18px;
 }
@@ -347,7 +304,7 @@ input[type="text"]::placeholder {
 
 /* SQL Panel */
 .sql-panel {
-    background: var(--bg-surface);
+    background: var(--color-bg-secondary);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -355,11 +312,11 @@ input[type="text"]::placeholder {
 
 .panel-header {
     padding: var(--spacing-lg) var(--spacing-xl);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border-primary);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--bg-surface);
+    background: var(--color-bg-secondary);
 }
 
 .panel-header h2 {
@@ -379,8 +336,8 @@ input[type="text"]::placeholder {
 }
 
 .sql-display {
-    background: var(--bg-code);
-    color: var(--text-code);
+    background: var(--color-sql-bg);
+    color: var(--color-sql-text);
     padding: var(--spacing-lg);
     border-radius: var(--border-radius);
     font-family: var(--font-mono);
@@ -409,7 +366,7 @@ input[type="text"]::placeholder {
     min-width: 300px;
     padding: var(--spacing-md) var(--spacing-lg);
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--color-shadow-lg);
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
@@ -428,17 +385,17 @@ input[type="text"]::placeholder {
 }
 
 .toast-success {
-    background: var(--success-color);
+    background: var(--color-success);
     color: white;
 }
 
 .toast-error {
-    background: var(--error-color);
+    background: var(--color-error);
     color: white;
 }
 
 .toast-warning {
-    background: var(--warning-color);
+    background: var(--color-warning);
     color: white;
 }
 
@@ -475,7 +432,7 @@ input[type="text"]::placeholder {
 
     .query-builder {
         border-right: none;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--color-border-primary);
         max-height: 50vh;
     }
 
@@ -496,16 +453,16 @@ input[type="text"]::placeholder {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-hover);
+    background: var(--color-bg-tertiary);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--border-color);
+    background: var(--color-border-primary);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--secondary-color);
+    background: var(--color-button-secondary);
 }
 
 /* ==================== History Sidebar ==================== */
@@ -516,7 +473,7 @@ input[type="text"]::placeholder {
     right: 0;
     width: 380px;
     height: 100vh;
-    background: var(--bg-surface);
+    background: var(--color-bg-secondary);
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -534,9 +491,9 @@ input[type="text"]::placeholder {
     align-items: center;
     justify-content: space-between;
     padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--border-color);
-    background: var(--bg-header);
-    color: var(--text-on-dark);
+    border-bottom: 1px solid var(--color-border-primary);
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
 }
 
 .sidebar-header h2 {
@@ -554,7 +511,7 @@ input[type="text"]::placeholder {
 
 .sidebar-actions {
     padding: var(--spacing-md);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border-primary);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
@@ -573,7 +530,7 @@ input[type="text"]::placeholder {
 
 .search-box {
     padding: var(--spacing-md);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border-primary);
     position: relative;
 }
 
@@ -582,14 +539,14 @@ input[type="text"]::placeholder {
     left: calc(var(--spacing-md) + 8px);
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
     pointer-events: none;
 }
 
 .search-box input {
     width: 100%;
     padding: 8px 12px 8px 32px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-border-primary);
     border-radius: var(--border-radius-sm);
     font-size: 14px;
     outline: none;
@@ -597,19 +554,19 @@ input[type="text"]::placeholder {
 }
 
 .search-box input:focus {
-    border-color: var(--primary-color);
+    border-color: var(--color-accent-primary);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .history-stats {
     padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--bg-hover);
+    background: var(--color-bg-tertiary);
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 12px;
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-color);
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-border-primary);
 }
 
 .history-list-container {
@@ -625,8 +582,8 @@ input[type="text"]::placeholder {
 }
 
 .history-item {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
     border-radius: var(--border-radius);
     margin-bottom: var(--spacing-sm);
     padding: var(--spacing-md);
@@ -639,8 +596,8 @@ input[type="text"]::placeholder {
 }
 
 .history-item:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-color);
+    box-shadow: var(--color-shadow-md);
+    border-color: var(--color-accent-primary);
 }
 
 .history-item-content {
@@ -667,7 +624,7 @@ input[type="text"]::placeholder {
 }
 
 .history-item-badge {
-    background: var(--primary-color);
+    background: var(--color-accent-primary);
     color: white;
     padding: 2px 6px;
     border-radius: var(--border-radius-sm);
@@ -683,11 +640,11 @@ input[type="text"]::placeholder {
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-xs);
     font-size: 12px;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
 }
 
 .history-item-details span {
-    background: var(--bg-hover);
+    background: var(--color-bg-tertiary);
     padding: 2px 6px;
     border-radius: var(--border-radius-sm);
 }
@@ -697,13 +654,13 @@ input[type="text"]::placeholder {
     justify-content: space-between;
     align-items: center;
     font-size: 11px;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
 }
 
 .history-item-delete {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
     cursor: pointer;
     padding: 4px;
     border-radius: var(--border-radius-sm);
@@ -712,7 +669,7 @@ input[type="text"]::placeholder {
 }
 
 .history-item-delete:hover {
-    background: var(--error-color);
+    background: var(--color-error);
     color: white;
 }
 
@@ -724,11 +681,11 @@ input[type="text"]::placeholder {
     height: 100%;
     padding: var(--spacing-xl);
     text-align: center;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
 }
 
 .history-empty svg {
-    color: var(--border-color);
+    color: var(--color-border-primary);
     margin-bottom: var(--spacing-md);
 }
 
@@ -770,9 +727,9 @@ input[type="text"]::placeholder {
 }
 
 .modal-content {
-    background: var(--bg-surface);
+    background: var(--color-bg-secondary);
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--color-shadow-lg);
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
@@ -796,7 +753,7 @@ input[type="text"]::placeholder {
     align-items: center;
     justify-content: space-between;
     padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border-primary);
 }
 
 .modal-header h3 {
@@ -808,7 +765,7 @@ input[type="text"]::placeholder {
 .modal-close {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
     cursor: pointer;
     padding: 4px;
     border-radius: var(--border-radius-sm);
@@ -816,7 +773,7 @@ input[type="text"]::placeholder {
 }
 
 .modal-close:hover {
-    background: var(--bg-hover);
+    background: var(--color-bg-tertiary);
     color: var(--text-primary);
 }
 
@@ -834,7 +791,7 @@ input[type="text"]::placeholder {
 .modal-body input {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-border-primary);
     border-radius: var(--border-radius-sm);
     font-size: 14px;
     outline: none;
@@ -842,7 +799,7 @@ input[type="text"]::placeholder {
 }
 
 .modal-body input:focus {
-    border-color: var(--primary-color);
+    border-color: var(--color-accent-primary);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -851,7 +808,7 @@ input[type="text"]::placeholder {
     justify-content: flex-end;
     gap: var(--spacing-sm);
     padding: var(--spacing-lg);
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--color-border-primary);
 }
 
 /* ==================== Button Styles (Additional) ==================== */
@@ -863,7 +820,7 @@ input[type="text"]::placeholder {
     padding: 6px 12px;
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-on-dark);
+    color: var(--color-text-inverse);
     cursor: pointer;
     border-radius: var(--border-radius-sm);
     font-size: 14px;
@@ -877,6 +834,191 @@ input[type="text"]::placeholder {
 
 .btn-icon svg {
     flex-shrink: 0;
+}
+
+/* ==================== Keyboard Shortcuts Modal ==================== */
+
+.shortcuts-intro {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border-primary);
+    background: var(--color-bg-tertiary);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    margin-bottom: var(--spacing-lg);
+}
+
+.shortcuts-intro p {
+    margin: 0 0 var(--spacing-sm);
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.shortcuts-intro strong {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.shortcuts-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+}
+
+.shortcuts-category {
+    margin-bottom: var(--spacing-lg);
+}
+
+.category-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-accent-primary);
+    display: inline-block;
+}
+
+.shortcuts-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.shortcuts-table th {
+    background: var(--color-bg-tertiary);
+    padding: var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid var(--color-border-primary);
+}
+
+.shortcuts-table td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border-primary);
+    color: var(--color-text-secondary);
+}
+
+.shortcuts-table tr:last-child td {
+    border-bottom: none;
+}
+
+.shortcuts-table tr:hover {
+    background: var(--color-bg-tertiary);
+}
+
+.shortcuts-table tr:hover td {
+    color: var(--color-text-primary);
+}
+
+.shortcut-combo {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.shortcut-description {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* kbd element styling for keyboard shortcuts */
+kbd {
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    display: inline-block;
+    margin: 0 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.shortcuts-close {
+    position: absolute;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    color: var(--color-text-primary);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.shortcuts-close:hover {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+}
+
+.shortcuts-close svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Responsive design for shortcuts modal */
+@media (max-width: 768px) {
+    .shortcuts-content {
+        max-height: 70vh;
+    }
+    
+    .shortcuts-table {
+        font-size: 12px;
+    }
+    
+    .shortcuts-table th,
+    .shortcuts-table td {
+        padding: var(--spacing-sm);
+    }
+    
+    .category-title {
+        font-size: 16px;
+    }
+    
+    kbd {
+        font-size: 11px;
+        padding: 1px 4px;
+    }
+}
+
+/* Focus styles for shortcuts table */
+.shortcuts-table th:focus,
+.shortcuts-table td:focus,
+.shortcuts-table tr:focus {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .shortcuts-table th {
+        border-bottom: 2px solid var(--color-border-primary);
+    }
+    
+    kbd {
+        border: 2px solid var(--color-border-primary);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .shortcuts-table tr:hover,
+    .shortcuts-close:hover {
+        transition: none;
+    }
 }
 
 /* ==================== Responsive Updates for History ==================== */

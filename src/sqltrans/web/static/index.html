@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SQLTrans - Interactive SQL Query Builder</title>
+    <link rel="stylesheet" href="/static/css/themes.css">
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/prism.css">
+    <link rel="stylesheet" href="/static/css/prism-dark.css" disabled>
 </head>
 <body>
     <div class="app-container">
@@ -26,6 +28,17 @@
                             <path d="M12 7v5l4 2"/>
                         </svg>
                         History
+                    </button>
+                    <button id="theme-toggle-btn" class="btn btn-icon" title="Toggle theme (Ctrl+Shift+T)">
+                        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <path d="M12 1v6m0 4v6M4 12h16"/>
+                            <path d="M23 6l-9 9l6-6" display="none"/>
+                        </svg>
+                        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1-9 9.79 9.79 0 01-1-9-9.79-9.79V12h16"/>
+                            <path d="M12 21.21A9 9 0 1 1 9.79 9.79 0 01-1 9.79-9.79v-3h-2"/>
+                        </svg>
                     </button>
                     <label for="dialect-select">Dialect:</label>
                     <select id="dialect-select" class="dialect-selector">
@@ -264,9 +277,11 @@
 
     <!-- Scripts -->
     <script src="/static/lib/prism.min.js"></script>
+    <script src="/static/js/theme.js"></script>
     <script src="/static/js/storage.js"></script>
     <script src="/static/js/api.js"></script>
     <script src="/static/js/ui.js"></script>
+    <script src="/static/js/keyboard.js"></script>
     <script src="/static/js/app.js"></script>
 </body>
 </html>

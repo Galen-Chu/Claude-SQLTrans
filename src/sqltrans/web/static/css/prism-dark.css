@@ -1,0 +1,245 @@
+/**
+ * Prism.js Dark Theme for SQL Syntax Highlighting
+ * Custom dark theme optimized for SQL code with WCAG AA compliance
+ * Designed to complement the main dark theme colors
+ */
+
+/* Prism.js dark theme customization */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: var(--color-sql-comment);
+    font-style: italic;
+}
+
+.token.punctuation {
+    color: var(--color-sql-text);
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+    color: var(--color-sql-number);
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+    color: var(--color-sql-string);
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+    color: var(--color-accent-primary);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+    color: var(--color-sql-keyword);
+    font-weight: 600;
+}
+
+.token.function,
+.token.class-name {
+    color: var(--color-accent-hover);
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+    color: var(--color-warning);
+}
+
+.token.important,
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}
+
+/* SQL-specific customizations for dark theme */
+.token.keyword.sql {
+    color: #93c5fd; /* bright blue for SQL keywords */
+    font-weight: 600;
+}
+
+.token.string.sql {
+    color: #34d399; /* green for string literals */
+}
+
+.token.number.sql {
+    color: #fbbf24; /* amber for numeric literals */
+}
+
+.token.function.sql {
+    color: #60a5fa; /* lighter blue for SQL functions */
+}
+
+.token.operator.sql {
+    color: #a78bfa; /* purple for operators */
+}
+
+.token.comment.sql {
+    color: #6b7280; /* gray for comments */
+    font-style: italic;
+}
+
+/* Prism code block background for dark theme */
+pre[class*="language-"],
+code[class*="language-"] {
+    background-color: var(--color-sql-bg);
+    border: 1px solid var(--color-sql-border);
+    color: var(--color-sql-text);
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    border-radius: 6px;
+    padding: 16px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    transition: background-color var(--transition-normal), 
+                border-color var(--transition-normal), 
+                color var(--transition-normal);
+}
+
+/* Code block with toolbar */
+div.code-toolbar {
+    background-color: var(--color-sql-bg);
+    border: 1px solid var(--color-sql-border);
+    border-radius: 6px 6px 0 0;
+}
+
+/* Line numbers */
+.line-numbers .line-numbers-rows {
+    border-right: 1px solid var(--color-sql-border);
+    color: var(--color-text-muted);
+}
+
+.line-numbers-rows > span:before {
+    color: var(--color-text-muted);
+}
+
+/* Highlighted lines */
+.highlight-line {
+    background-color: var(--color-accent-light);
+    border-left: 3px solid var(--color-accent-primary);
+    padding-left: 13px;
+    margin-left: -13px;
+}
+
+/* Selection colors */
+::selection {
+    background-color: var(--color-accent-lighter);
+    color: var(--color-text-primary);
+}
+
+::-moz-selection {
+    background-color: var(--color-accent-lighter);
+    color: var(--color-text-primary);
+}
+
+/* Copy to clipboard button */
+div.code-toolbar > .toolbar-item > a {
+    background-color: var(--color-button-secondary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    transition: background-color var(--transition-normal), 
+                border-color var(--transition-normal), 
+                color var(--transition-normal);
+}
+
+div.code-toolbar > .toolbar-item > a:hover {
+    background-color: var(--color-button-secondary-hover);
+    border-color: var(--color-border-focus);
+}
+
+/* Focus styles for accessibility */
+pre[class*="language-"]:focus,
+code[class*="language-"]:focus {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+}
+
+/* Scrollbar styling for code blocks in dark mode */
+pre[class*="language-"]::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-track {
+    background-color: var(--color-sql-bg);
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-secondary);
+    border-radius: 6px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-border-focus);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    pre[class*="language-"],
+    code[class*="language-"] {
+        font-size: 12px;
+        padding: 12px;
+    }
+    
+    div.code-toolbar > .toolbar-item > a {
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .token.keyword.sql {
+        color: #4da6ff; /* brighter blue for contrast */
+    }
+    
+    .token.string.sql {
+        color: #6ee7b7; /* brighter green */
+    }
+    
+    .token.number.sql {
+        color: #fcd34d; /* brighter amber */
+    }
+    
+    pre[class*="language-"]:focus,
+    code[class*="language-"]:focus {
+        outline: 3px solid var(--color-border-focus);
+        outline-offset: 3px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    pre[class*="language-"],
+    code[class*="language-"],
+    div.code-toolbar > .toolbar-item > a {
+        transition: none;
+    }
+}

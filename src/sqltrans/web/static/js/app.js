@@ -15,9 +15,12 @@ class SQLTransApp {
 
         this.elements = {};
         this.storage = new QueryStorage();
+        this.themeManager = new ThemeManager();
+        this.keyboardManager = new KeyboardManager(this);
         this.autoSaveTimer = null;
         this.isSidebarOpen = false;
-        this.init();
+        this.themeManager.init();
+        this.keyboardManager.init();
     }
 
     /**
@@ -47,7 +50,7 @@ class SQLTransApp {
             copyBtn: document.getElementById('copy-btn'),
             downloadBtn: document.getElementById('download-btn'),
             // History elements
-            historyToggleBtn: document.getElementById('history-toggle-btn'),
+            themeToggleBtn: document.getElementById('theme-toggle-btn'),
             historySidebar: document.getElementById('history-sidebar'),
             closeSidebarBtn: document.getElementById('close-sidebar-btn'),
             saveQueryBtn: document.getElementById('save-query-btn'),
@@ -70,6 +73,11 @@ class SQLTransApp {
     attachEventListeners() {
         // Dialect selector
         this.elements.dialectSelect.addEventListener('change', (e) => this.handleDialectChange(e));
+
+        // Theme toggle button
+        this.elements.themeToggleBtn.addEventListener('click', () => {
+            this.themeManager.toggle();
+        });
 
         // Table input
         this.elements.tableInput.addEventListener('blur', (e) => this.handleTableChange(e));
@@ -145,23 +153,13 @@ class SQLTransApp {
             }
         });
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            // Ctrl+H to toggle history
-            if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
-                e.preventDefault();
-                this.toggleHistorySidebar();
-            }
-            // Escape to close sidebar and modals
-            if (e.key === 'Escape') {
-                if (this.isSidebarOpen) {
-                    this.toggleHistorySidebar();
-                }
-                if (!this.elements.saveQueryModal.classList.contains('hidden')) {
-                    this.closeSaveQueryModal();
-                }
-            }
+        // Theme change event listener
+        document.addEventListener('themechange', (e) => {
+            // Update UI when theme changes
+            console.log(`Theme changed to: ${e.detail.newTheme}`);
         });
+
+
     }
 
     /**
