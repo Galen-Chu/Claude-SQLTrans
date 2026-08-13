@@ -34,7 +34,7 @@ sqltrans/
 │   │   └── connections.py   # named connections (env-var secrets)
 │   ├── web/
 │   │   ├── app.py           # FastAPI app (v2 API)
-│   │   ���── launcher.py      # uvicorn launcher
+│   │   ├── launcher.py      # uvicorn launcher
 │   │   └── static/          # web GUI (index.html, js/, css/, lib/)
 │   ├── utils/
 │   │   ├── config.py        # ~/.sqltrans/config.toml

@@ -40,7 +40,7 @@ flowchart TB
 - 🌐 **網頁 GUI**：Translate（貼上 SQL 轉譯）、Ask（自然語言生成 + 回饋）、Run（唯讀執行）、Schema（探勘）四個分頁。
 - 🔁 **跨方言轉譯**：PostgreSQL、Oracle、MySQL、T-SQL、SQLite、Snowflake、BigQuery、DuckDB（sqlglot）。
 - 🤖 **自然語言 → SQL**：Claude 生成，輸出再經同一道唯讀閘道驗證；支援各方言 few-shot 與回饋迴圈。
-- 🛡️ **唯讀執行**：AST 政策 + 語句逾時 + 列數上限 + 分頁 + 連線池 + ��果快取。
+- 🛡️ **唯讀執行**：AST 政策 + 語句逾時 + 列數上限 + 分頁 + 連線池 + 結果快取。
 - 🔑 **具名連線**：`~/.sqltrans/connections.toml` 放 metadata，連線 URL 放環境變數（金鑰不落地）。
 
 ### 安裝
@@ -78,10 +78,6 @@ sqltrans gui
 ### 文件
 
 - [系統設計](SYSTEM_DESIGN.md) · [開發指南](docs/development.md) · [快速開始](docs/quick-start.md) · [文件索引](docs/index.md)
-
-### ��統需求
-
-Python 3.10+；Windows / macOS / Linux。授權：MIT（見 [LICENSE](LICENSE)）。
 
 ---
 
@@ -159,7 +155,3 @@ sqltrans gui
 ### Documentation
 
 - [System Design](SYSTEM_DESIGN.md) · [Development Guide](docs/development.md) · [Quick Start](docs/quick-start.md) · [Documentation Index](docs/index.md)
-
-### Requirements
-
-Python 3.10+; Windows / macOS / Linux. License: MIT (see [LICENSE](LICENSE)).
