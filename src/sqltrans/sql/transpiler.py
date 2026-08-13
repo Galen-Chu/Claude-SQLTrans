@@ -1,11 +1,10 @@
 """SQL transpilation engine built on sqlglot, with read-only enforcement.
 
-This module is the v2 SQL engine. Where the legacy `builder.py` can only
-*serialize* a Python `QueryState` into one dialect of SQL, this module can
-*parse* any SQL string and *transpile* it between dialects (Oracle, Postgres,
-MySQL, T-SQL, ...). The hard work is delegated to `sqlglot`; what this module
-adds is a strict read-only safety policy so the engine is safe to expose
-behind the web API and (later) to drive against live databases.
+This module is the SQL engine: it *parses* any SQL string and *transpiles* it
+between dialects (Oracle, Postgres, MySQL, T-SQL, ...). The hard work is
+delegated to `sqlglot`; what this module adds is a strict read-only safety
+policy so the engine is safe to expose behind the web API and to run against
+live databases.
 
 Public surface:
 

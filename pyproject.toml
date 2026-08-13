@@ -32,9 +32,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "textual>=0.47.0",
     "rich>=13.7.0",
-    "pyperclip>=1.8.2",
     "tomli>=2.0.1; python_version<'3.11'",
     "fastapi>=0.104.0",
     "uvicorn[standard]>=0.24.0",
@@ -104,10 +102,6 @@ warn_unused_ignores = true
 warn_no_return = true
 strict_equality = true
 strict_concatenate = true
-
-[[tool.mypy.overrides]]
-module = "pyperclip.*"
-ignore_missing_imports = true
 
 [tool.black]
 line-length = 100

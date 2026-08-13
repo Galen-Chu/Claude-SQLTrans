@@ -1,6 +1,29 @@
-"""SQL generation and formatting modules."""
+"""SQL engine: cross-dialect transpilation with a read-only safety policy.
 
-from sqltrans.sql.builder import QueryBuilder
-from sqltrans.sql.formatter import format, highlight
+The interactive query builder (v1) has been removed. This package now exposes
+the sqlglot-backed transpiler (parse → AST read-only policy → emit in any
+dialect) and, via :mod:`sqltrans.sql.nl2sql`, the natural-language → SQL
+adapter.
+"""
 
-__all__ = ["QueryBuilder", "format", "highlight"]
+from sqltrans.sql.transpiler import (
+    SUPPORTED_DIALECTS,
+    TranspileError,
+    UnsafeQueryError,
+    enforce_read_only,
+    normalize_dialect,
+    parse_one_statement,
+    transpile,
+    validate_read_only,
+)
+
+__all__ = [
+    "SUPPORTED_DIALECTS",
+    "TranspileError",
+    "UnsafeQueryError",
+    "enforce_read_only",
+    "normalize_dialect",
+    "parse_one_statement",
+    "transpile",
+    "validate_read_only",
+]
