@@ -14,6 +14,23 @@ from sqltrans.models.filters import Filter
 from sqltrans.sql.builder import QueryBuilder
 from sqltrans.sql.dialects import get_dialect
 from sqltrans.sql.formatter import format as format_sql
+from sqltrans.sql.transpiler import (
+    SUPPORTED_DIALECTS as TRANSPILER_DIALECTS,
+    TranspileError,
+    UnsafeQueryError,
+    transpile as transpile_sql,
+)
+from sqltrans.sql.nl2sql import (
+    DEFAULT_MODEL as NL2SQL_DEFAULT_MODEL,
+    NL2SQLError,
+    nl2sql,
+)
+from sqltrans.db import (
+    DEFAULT_ROW_LIMIT,
+    execute_read_only,
+    introspect,
+    create_db_engine,
+)
 from sqltrans.utils.validation import validate_identifier, validate_operator, validate_value
 from sqltrans.utils.logging import get_logger
 
@@ -55,6 +72,55 @@ class DialectRequest(BaseModel):
     """Request model for changing dialect."""
 
     dialect: str = Field(..., description="SQL dialect")
+
+
+class TranspileRequest(BaseModel):
+    """Request model for cross-dialect SQL transpilation."""
+
+    sql: str = Field(..., min_length=1, description="Source SQL to convert")
+    read: Optional[str] = Field(
+        None, description="Source dialect (e.g. oracle, postgresql, mysql, tsql)"
+    )
+    write: Optional[str] = Field(
+        None, description="Target dialect (e.g. postgres, oracle, mysql, tsql)"
+    )
+    pretty: bool = Field(True, description="Pretty-print the output SQL")
+
+
+class NL2SQLRequest(BaseModel):
+    """Request model for natural-language → SQL generation."""
+
+    prompt: str = Field(..., min_length=1, description="Natural-language request")
+    dialect: Optional[str] = Field(
+        None, description="Target SQL dialect hint (e.g. postgresql, mysql)"
+    )
+    connection: Optional[str] = Field(
+        None,
+        description=(
+            "Optional SQLAlchemy connection URL. If given, the live schema is "
+            "introspected and included as context for schema-aware SQL. "
+            "Warning: may contain credentials; never log it."
+        ),
+    )
+    model: Optional[str] = Field(
+        None, description=f"Claude model ID (default {NL2SQL_DEFAULT_MODEL})"
+    )
+    transpile_to: Optional[str] = Field(
+        None, description="If given, transpile the validated draft to this dialect"
+    )
+
+
+class ExecuteRequest(BaseModel):
+    """Request model for read-only query execution."""
+
+    sql: str = Field(..., min_length=1, description="SQL to execute (must be a read-only SELECT)")
+    connection: str = Field(..., description="SQLAlchemy connection URL")
+    dialect: Optional[str] = Field(
+        None, description="Source dialect for validation (e.g. postgresql, sqlite)"
+    )
+    row_limit: int = Field(
+        DEFAULT_ROW_LIMIT, ge=1, description="Maximum rows to return"
+    )
 
 
 class QueryStateResponse(BaseModel):
@@ -326,6 +392,209 @@ async def get_dialects():
         List of dialect names
     """
     return {"dialects": list(VALID_DIALECTS)}
+
+
+@app.get("/api/transpile/dialects")
+async def get_transpile_dialects():
+    """List dialects supported by the transpilation engine.
+
+    Returns:
+        Sorted list of canonical dialect names. Aliases (e.g. ``postgresql``)
+        are also accepted by the transpile endpoint but not listed here.
+    """
+    return {"dialects": sorted(TRANSPILER_DIALECTS)}
+
+
+@app.post("/api/transpile")
+async def transpile(request: TranspileRequest):
+    """Convert a SQL statement from one dialect to another.
+
+    The input is parsed and validated as a single read-only (SELECT-only)
+    statement before conversion. Write/DDL/DCL statements, multi-statement
+    input, and ``SELECT ... INTO`` are rejected with HTTP 400.
+
+    Args:
+        request: Source SQL plus optional read/write dialects.
+
+    Returns:
+        Converted SQL (plain and pretty), plus the resolved dialect names.
+
+    Raises:
+        HTTPException: 400 if the input violates the read-only policy,
+            422 if it cannot be parsed, 400 for an unknown dialect.
+    """
+    try:
+        converted = transpile_sql(
+            request.sql,
+            read=request.read,
+            write=request.write,
+            pretty=request.pretty,
+        )
+    except UnsafeQueryError as e:
+        logger.warning("Rejected unsafe transpile request: %s", e)
+        raise HTTPException(status_code=400, detail=str(e))
+    except TranspileError as e:
+        logger.info("Unparseable transpile request: %s", e)
+        raise HTTPException(status_code=422, detail=str(e))
+    except ValueError as e:
+        # Unknown dialect name from normalize_dialect()
+        raise HTTPException(status_code=400, detail=str(e))
+
+    from sqltrans.sql.transpiler import normalize_dialect
+
+    logger.info(
+        "Transpiled %s -> %s",
+        request.read or "default",
+        request.write or "default",
+    )
+    return {
+        "sql": converted,
+        "read": normalize_dialect(request.read),
+        "write": normalize_dialect(request.write),
+    }
+
+
+@app.post("/api/nl2sql")
+async def generate_sql_from_nl(request: NL2SQLRequest):
+    """Generate validated, read-only SQL from a natural-language request.
+
+    The LLM's draft is parsed and run through the AST read-only policy before it
+    is returned. If ``connection`` is given, the live schema is introspected for
+    schema-aware generation.
+
+    Args:
+        request: Natural-language prompt plus optional dialect, connection, model.
+
+    Returns:
+        The generated SQL (``sql``), whether it passed validation (``validated``),
+        any ``warnings``, the raw model output, and the resolved ``dialect``.
+
+    Raises:
+        HTTPException: 400 for schema-introspection failures, 502 for LLM
+            call failures.
+    """
+    schema_ctx = None
+    if request.connection:
+        try:
+            engine = create_db_engine(request.connection)
+            schema_ctx = introspect(engine)
+        except Exception as e:
+            # Do not log the connection string; it may contain credentials.
+            logger.warning("Schema introspection for nl2sql failed")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Could not introspect schema: {type(e).__name__}",
+            )
+
+    try:
+        result = nl2sql(
+            request.prompt,
+            dialect=request.dialect,
+            schema=schema_ctx,
+            model=request.model or NL2SQL_DEFAULT_MODEL,
+            transpile_to=request.transpile_to,
+        )
+    except NL2SQLError as e:
+        logger.warning("NL→SQL LLM call failed")
+        raise HTTPException(status_code=502, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return {
+        "sql": result.sql,
+        "validated": result.validated,
+        "warnings": result.warnings,
+        "dialect": result.dialect,
+        "raw": result.raw,
+    }
+
+
+@app.get("/api/schema")
+async def get_schema(connection: str, schema: Optional[str] = None):
+    """List tables and columns of a database.
+
+    Args:
+        connection: SQLAlchemy connection URL.
+        schema: Optional schema/namespace (e.g. ``public``).
+
+    Returns:
+        Tables with their columns (name, type, nullable).
+
+    Raises:
+        HTTPException: 400 if the database cannot be introspected.
+    """
+    try:
+        engine = create_db_engine(connection)
+        tables = introspect(engine, schema=schema)
+    except Exception as e:
+        logger.warning("Schema introspection failed")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Could not introspect schema: {type(e).__name__}",
+        )
+
+    return {
+        "tables": [
+            {
+                "name": t.name,
+                "columns": [
+                    {"name": c.name, "type": c.type, "nullable": c.nullable}
+                    for c in t.columns
+                ],
+            }
+            for t in tables
+        ]
+    }
+
+
+@app.post("/api/query/execute")
+async def execute_query(request: ExecuteRequest):
+    """Validate and execute a single read-only SELECT against a database.
+
+    The SQL is parsed and policy-checked (SELECT-only, single statement, no
+    ``SELECT ... INTO``) **before** any connection is opened. Results are
+    row-capped.
+
+    Args:
+        request: SQL, connection URL, optional dialect and row limit.
+
+    Returns:
+        Columns, rows, row count, and a ``truncated`` flag.
+
+    Raises:
+        HTTPException: 400 for unsafe/non-SELECT SQL, 422 for unparseable SQL,
+            400 for database/execution errors.
+    """
+    try:
+        engine = create_db_engine(request.connection)
+        result = execute_read_only(
+            engine,
+            request.sql,
+            dialect=request.dialect,
+            row_limit=request.row_limit,
+        )
+    except UnsafeQueryError as e:
+        logger.warning("Rejected unsafe execution request")
+        raise HTTPException(status_code=400, detail=str(e))
+    except TranspileError as e:
+        logger.info("Unparseable execution request")
+        raise HTTPException(status_code=422, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # Database / connection / operational errors. Do not log the connection.
+        logger.warning("Query execution failed")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Execution failed: {type(e).__name__}: {e}",
+        )
+
+    return {
+        "columns": result.columns,
+        "rows": result.rows,
+        "row_count": result.row_count,
+        "truncated": result.truncated,
+    }
 
 
 @app.get("/health")
