@@ -128,8 +128,6 @@ sqltrans gui
 
 ---
 
-<div align="center">
 
 Made with ❤️ for API testing · 用 ❤️ 為 API 測試而造
 
-</div>
