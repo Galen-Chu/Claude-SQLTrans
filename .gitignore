@@ -146,7 +146,6 @@ logs/
 
 # Development and testing files
 demo_*.py
-test_*.py
 check_*.py
 verify_*.py
 simple_mode.py

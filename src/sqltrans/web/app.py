@@ -24,12 +24,15 @@ from sqltrans.sql.nl2sql import (
     DEFAULT_MODEL as NL2SQL_DEFAULT_MODEL,
     NL2SQLError,
     nl2sql,
+    record_feedback,
 )
 from sqltrans.db import (
     DEFAULT_ROW_LIMIT,
     execute_read_only,
+    get_engine,
     introspect,
-    create_db_engine,
+    list_connections,
+    resolve_url,
 )
 from sqltrans.utils.validation import validate_identifier, validate_operator, validate_value
 from sqltrans.utils.logging import get_logger
@@ -102,6 +105,13 @@ class NL2SQLRequest(BaseModel):
             "Warning: may contain credentials; never log it."
         ),
     )
+    connection_name: Optional[str] = Field(
+        None,
+        description=(
+            "Named connection (from ~/.sqltrans/connections.toml) to introspect "
+            "for schema-aware SQL. Its URL is read from $SQLTRANS_CONN_<NAME>."
+        ),
+    )
     model: Optional[str] = Field(
         None, description=f"Claude model ID (default {NL2SQL_DEFAULT_MODEL})"
     )
@@ -114,13 +124,33 @@ class ExecuteRequest(BaseModel):
     """Request model for read-only query execution."""
 
     sql: str = Field(..., min_length=1, description="SQL to execute (must be a read-only SELECT)")
-    connection: str = Field(..., description="SQLAlchemy connection URL")
+    connection: Optional[str] = Field(
+        None, description="SQLAlchemy connection URL (or use connection_name)"
+    )
+    connection_name: Optional[str] = Field(
+        None,
+        description=(
+            "Named connection (from ~/.sqltrans/connections.toml) whose URL is "
+            "read from $SQLTRANS_CONN_<NAME>."
+        ),
+    )
     dialect: Optional[str] = Field(
         None, description="Source dialect for validation (e.g. postgresql, sqlite)"
     )
     row_limit: int = Field(
         DEFAULT_ROW_LIMIT, ge=1, description="Maximum rows to return"
     )
+
+
+class FeedbackRequest(BaseModel):
+    """Request model for NL→SQL feedback ('did this answer the question?')."""
+
+    prompt: str = Field(..., min_length=1, description="The original natural-language request")
+    sql: Optional[str] = Field(None, description="The SQL that was produced, if any")
+    accepted: bool = Field(..., description="True if the user accepted the result as correct")
+    dialect: Optional[str] = Field(None, description="Dialect the draft targeted, if any")
+    validated: bool = Field(False, description="Whether the draft passed the read-only policy")
+    comment: str = Field("", description="Optional free-text note")
 
 
 class QueryStateResponse(BaseModel):
@@ -149,6 +179,22 @@ class ErrorResponse(BaseModel):
 static_dir = Path(__file__).parent / "static"
 if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+
+def _resolve_connection_url(
+    connection: Optional[str], connection_name: Optional[str]
+) -> Optional[str]:
+    """Resolve a connection URL from an explicit URL or a named connection.
+
+    An explicit ``connection`` URL takes precedence; otherwise the named
+    connection is resolved via the connection manager (reads
+    ``$SQLTRANS_CONN_<NAME>``). Returns None if neither is provided.
+    """
+    if connection:
+        return connection
+    if connection_name:
+        return resolve_url(connection_name)
+    return None
 
 
 @app.get("/")
@@ -474,10 +520,13 @@ async def generate_sql_from_nl(request: NL2SQLRequest):
             call failures.
     """
     schema_ctx = None
-    if request.connection:
+    url = _resolve_connection_url(request.connection, request.connection_name)
+    if url:
         try:
-            engine = create_db_engine(request.connection)
+            engine = get_engine(url)
             schema_ctx = introspect(engine)
+        except (KeyError, LookupError) as e:
+            raise HTTPException(status_code=400, detail=str(e))
         except Exception as e:
             # Do not log the connection string; it may contain credentials.
             logger.warning("Schema introspection for nl2sql failed")
@@ -510,22 +559,36 @@ async def generate_sql_from_nl(request: NL2SQLRequest):
 
 
 @app.get("/api/schema")
-async def get_schema(connection: str, schema: Optional[str] = None):
+async def get_schema(
+    connection: Optional[str] = None,
+    schema: Optional[str] = None,
+    connection_name: Optional[str] = None,
+):
     """List tables and columns of a database.
 
     Args:
         connection: SQLAlchemy connection URL.
+        connection_name: Named connection (resolved via $SQLTRANS_CONN_<NAME>).
         schema: Optional schema/namespace (e.g. ``public``).
 
     Returns:
         Tables with their columns (name, type, nullable).
 
     Raises:
-        HTTPException: 400 if the database cannot be introspected.
+        HTTPException: 400 if the database cannot be introspected or the
+            connection is unresolved.
     """
+    url = _resolve_connection_url(connection, connection_name)
+    if url is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide 'connection' (URL) or 'connection_name'.",
+        )
     try:
-        engine = create_db_engine(connection)
+        engine = get_engine(url)
         tables = introspect(engine, schema=schema)
+    except (KeyError, LookupError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.warning("Schema introspection failed")
         raise HTTPException(
@@ -565,14 +628,22 @@ async def execute_query(request: ExecuteRequest):
         HTTPException: 400 for unsafe/non-SELECT SQL, 422 for unparseable SQL,
             400 for database/execution errors.
     """
+    url = _resolve_connection_url(request.connection, request.connection_name)
+    if url is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide 'connection' (URL) or 'connection_name'.",
+        )
     try:
-        engine = create_db_engine(request.connection)
+        engine = get_engine(url)
         result = execute_read_only(
             engine,
             request.sql,
             dialect=request.dialect,
             row_limit=request.row_limit,
         )
+    except (KeyError, LookupError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except UnsafeQueryError as e:
         logger.warning("Rejected unsafe execution request")
         raise HTTPException(status_code=400, detail=str(e))
@@ -582,11 +653,13 @@ async def execute_query(request: ExecuteRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        # Database / connection / operational errors. Do not log the connection.
-        logger.warning("Query execution failed")
+        # Database / connection / operational errors. Do not echo the exception
+        # message to the client (it may include connection details); log the
+        # type server-side without the URL.
+        logger.warning("Query execution failed: %s", type(e).__name__)
         raise HTTPException(
             status_code=400,
-            detail=f"Execution failed: {type(e).__name__}: {e}",
+            detail=f"Execution failed: {type(e).__name__}",
         )
 
     return {
@@ -605,6 +678,45 @@ async def health_check():
         Health status
     """
     return {"status": "ok", "version": "0.1.0"}
+
+
+@app.get("/api/connections")
+async def get_connections():
+    """List registered named connections (metadata only — never URLs).
+
+    Returns:
+        Connection names with their non-secret metadata.
+    """
+    conns = list_connections()
+    return {
+        "connections": [
+            {
+                "name": c.name,
+                "dialect": c.dialect,
+                "schema": c.schema,
+                "description": c.description,
+            }
+            for c in conns.values()
+        ]
+    }
+
+
+@app.post("/api/nl2sql/feedback")
+async def nl2sql_feedback(request: FeedbackRequest):
+    """Record NL→SQL feedback ('did this answer the question?').
+
+    Returns:
+        Confirmation and the path the feedback was appended to.
+    """
+    path = record_feedback(
+        prompt=request.prompt,
+        sql=request.sql,
+        accepted=request.accepted,
+        dialect=request.dialect,
+        validated=request.validated,
+        comment=request.comment,
+    )
+    return {"recorded": True, "path": str(path)}
 
 
 # Error handlers

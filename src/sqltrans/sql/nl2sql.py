@@ -25,9 +25,12 @@ use :func:`sqltrans.db.executor.execute_read_only`, which validates again).
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass, field
-from typing import Any, List, Optional, Protocol
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Protocol
 
 from sqltrans.db.introspection import TableSchema, render_schema_for_prompt
 from sqltrans.sql.transpiler import (
@@ -50,6 +53,66 @@ _SQL_STARTERS = {"SELECT", "WITH"}
 
 # Matches a fenced code block, optional ```sql language tag, capturing the body.
 _FENCE_RE = re.compile(r"```(?:sql)?\s*\n?(.*?)```", re.IGNORECASE | re.DOTALL)
+
+# Per-dialect few-shot examples (request -> SQL) injected into the user prompt
+# to steer output toward idiomatic SQL for the target database. Kept small and
+# high-signal; the draft is always re-validated by the read-only gate before it
+# is returned as runnable SQL.
+_FEW_SHOT: Dict[str, List[tuple[str, str]]] = {
+    "postgres": [
+        (
+            "count active users grouped by plan",
+            "SELECT plan, COUNT(*) FROM users WHERE active IS TRUE GROUP BY plan",
+        ),
+        (
+            "orders for user 42 in the last 7 days",
+            "SELECT * FROM orders WHERE user_id = 42 "
+            "AND created_at >= CURRENT_DATE - INTERVAL '7 days'",
+        ),
+    ],
+    "oracle": [
+        (
+            "count active users grouped by plan",
+            "SELECT plan, COUNT(*) FROM users WHERE active = 1 GROUP BY plan",
+        ),
+        (
+            "orders for user 42 in the last 7 days",
+            "SELECT * FROM orders WHERE user_id = 42 AND created_at >= SYSDATE - 7",
+        ),
+    ],
+    "mysql": [
+        (
+            "count active users grouped by plan",
+            "SELECT plan, COUNT(*) FROM users WHERE active = 1 GROUP BY plan",
+        ),
+        (
+            "orders for user 42 in the last 7 days",
+            "SELECT * FROM orders WHERE user_id = 42 "
+            "AND created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)",
+        ),
+    ],
+    "tsql": [
+        (
+            "count active users grouped by plan",
+            "SELECT plan, COUNT(*) FROM users WHERE active = 1 GROUP BY plan",
+        ),
+        (
+            "orders for user 42 in the last 7 days",
+            "SELECT * FROM orders WHERE user_id = 42 "
+            "AND created_at >= DATEADD(day, -7, GETDATE())",
+        ),
+    ],
+}
+
+
+def _few_shot_for(dialect: Optional[str]) -> List[tuple[str, str]]:
+    """Return few-shot examples for a dialect (alias-normalized), or ``[]``."""
+    if not dialect:
+        return []
+    try:
+        return _FEW_SHOT.get(normalize_dialect(dialect), [])
+    except ValueError:
+        return []
 
 
 # --------------------------------------------------------------------------- #
@@ -178,13 +241,26 @@ def _build_system_prompt(dialect: Optional[str]) -> str:
     return _SYSTEM_PROMPT + f"\nTarget dialect: {target}.\n"
 
 
-def _build_user_prompt(prompt: str, schema: Optional[List[TableSchema]]) -> str:
+def _build_user_prompt(
+    prompt: str,
+    schema: Optional[List[TableSchema]],
+    dialect: Optional[str] = None,
+) -> str:
     parts: List[str] = []
     if schema:
         rendered = render_schema_for_prompt(schema)
         if rendered:
             parts.append(rendered)
             parts.append("")  # blank line between schema and request
+
+    few_shot = _few_shot_for(dialect)
+    if few_shot:
+        parts.append("Examples of the SQL style expected:")
+        for req, sql in few_shot:
+            parts.append(f"  Request: {req}")
+            parts.append(f"  SQL: {sql}")
+        parts.append("")
+
     parts.append("Request:")
     parts.append(prompt)
     return "\n".join(parts)
@@ -233,6 +309,58 @@ def extract_sql(text: str) -> Optional[str]:
 
 
 # --------------------------------------------------------------------------- #
+# Feedback ("did this answer the question?" loop)
+# --------------------------------------------------------------------------- #
+
+
+def _feedback_path() -> Path:
+    """Return the path to the append-only feedback log."""
+    return Path.home() / ".sqltrans" / "feedback.jsonl"
+
+
+def record_feedback(
+    *,
+    prompt: str,
+    sql: Optional[str],
+    accepted: bool,
+    dialect: Optional[str] = None,
+    validated: bool = False,
+    comment: str = "",
+) -> Path:
+    """Append a labelled feedback record to ``~/.sqltrans/feedback.jsonl``.
+
+    Drives the "did this answer the question?" control so future NL→SQL quality
+    work has real signal. The file is append-only JSON Lines.
+
+    Args:
+        prompt: The original natural-language request.
+        sql: The SQL that was produced (``None`` if none was generated).
+        accepted: True if the user accepted the result as correct.
+        dialect: The dialect the draft targeted, if any.
+        validated: Whether the draft passed the read-only policy.
+        comment: Optional free-text note from the user.
+
+    Returns:
+        The path the record was written to.
+    """
+    path = _feedback_path()
+    path.parent.mkdir(exist_ok=True)
+    entry: Dict[str, Any] = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "prompt": prompt,
+        "sql": sql,
+        "accepted": bool(accepted),
+        "dialect": dialect,
+        "validated": bool(validated),
+        "comment": comment,
+    }
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    logger.info("Recorded NL→SQL feedback (accepted=%s)", entry["accepted"])
+    return path
+
+
+# --------------------------------------------------------------------------- #
 # Main entry point
 # --------------------------------------------------------------------------- #
 
@@ -275,7 +403,7 @@ def nl2sql(
     client = llm if llm is not None else AnthropicLLMClient()
 
     system = _build_system_prompt(dialect)
-    user = _build_user_prompt(prompt, schema)
+    user = _build_user_prompt(prompt, schema, dialect)
 
     logger.info("Calling LLM for NL→SQL (model=%s)", model)
     try:
