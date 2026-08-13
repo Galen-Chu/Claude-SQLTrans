@@ -34,6 +34,22 @@ flowchart TB
 
 所有產生或執行的 SQL，都會先經過**唯讀 AST 安全政策**把關一次——寫入、DDL、DCL、多語句注入一律在接觸資料庫前被拒絕。
 
+### 專案結構
+
+```
+sqltrans/
+├── src/sqltrans/            # engine, CLI, web, db, utils
+│   ├── sql/                 # transpiler.py (sqlglot + read-only), nl2sql.py
+│   ├── db/                  # introspection, executor, engine, connections
+│   ├── web/                 # FastAPI app + static web GUI
+│   ├── utils/               # config, logging
+│   └── __main__.py          # CLI entry point (translate/nl2sql/run/schema/gui)
+├── tests/                   # unit + integration + e2e
+├── docs/                    # documentation
+├── examples/                # example queries / scenarios
+└── pyproject.toml
+```
+
 ### 功能
 
 - 💻 **CLI（主力）**：`translate`、`nl2sql`、`run`、`schema`、`gui` 子指令，可腳本化、可管線。
@@ -110,6 +126,22 @@ flowchart TB
 ```
 
 Every SQL string the system produces or runs is first gated by a **read-only safety policy enforced on the parsed AST** — writes, DDL, DCL, and multi-statement injection are all rejected before reaching the database.
+
+### Project Structure
+
+```
+sqltrans/
+├── src/sqltrans/            # engine, CLI, web, db, utils
+│   ├── sql/                 # transpiler.py (sqlglot + read-only), nl2sql.py
+│   ├── db/                  # introspection, executor, engine, connections
+│   ├── web/                 # FastAPI app + static web GUI
+│   ├── utils/               # config, logging
+│   └── __main__.py          # CLI entry point (translate/nl2sql/run/schema/gui)
+├── tests/                   # unit + integration + e2e
+├── docs/                    # documentation
+├── examples/                # example queries / scenarios
+└── pyproject.toml
+```
 
 ### Features
 
