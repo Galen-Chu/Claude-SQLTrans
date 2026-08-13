@@ -187,3 +187,15 @@ sqltrans gui
 ### Documentation
 
 - [System Design](SYSTEM_DESIGN.md) · [Development Guide](docs/development.md) · [Quick Start](docs/quick-start.md) · [Documentation Index](docs/index.md)
+
+## 👤 作者 / Author
+
+**Galen-Chu**
+
+---
+
+<div align="center">
+
+Made with ❤️ for API testing · 用 ❤️ 為 API 測試而造
+
+</div>
