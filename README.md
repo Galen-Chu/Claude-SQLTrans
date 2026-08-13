@@ -1,14 +1,10 @@
 # SQLTrans
 
-**Bilingual README / 雙語 README** · **[繁體中文](#繁體中文)** | **[English](#english)**
-
----
-
-## 繁體中文
-
 **SQLTrans** 是一套給客服支援工程師的 SQL 工具——把 SQL **轉譯**到不同資料庫方言、用**自然語言生成** SQL，並對即時資料庫執行**唯讀**查詢。提供 CLI 與網頁 GUI 兩種介面。
 
-### 架構
+**SQLTrans** is a SQL tool for customer-support engineers — **transpile** SQL between dialects, **generate** SQL from natural language, and run **read-only** queries against a live database. Exposed through a CLI and a web GUI.
+
+## 架構 / Architecture
 
 ```mermaid
 flowchart TB
@@ -34,7 +30,9 @@ flowchart TB
 
 所有產生或執行的 SQL，都會先經過**唯讀 AST 安全政策**把關一次——寫入、DDL、DCL、多語句注入一律在接觸資料庫前被拒絕。
 
-### 專案結構
+Every SQL string the system produces or runs is first gated by a **read-only safety policy enforced on the parsed AST** — writes, DDL, DCL, and multi-statement injection are all rejected before reaching the database.
+
+## 專案結構 / Project Structure
 
 ```
 sqltrans/
@@ -50,7 +48,7 @@ sqltrans/
 └── pyproject.toml
 ```
 
-### 功能
+## 功能 / Features
 
 - 💻 **CLI（主力）**：`translate`、`nl2sql`、`run`、`schema`、`gui` 子指令，可腳本化、可管線。
 - 🌐 **網頁 GUI**：Translate（貼上 SQL 轉譯）、Ask（自然語言生成 + 回饋）、Run（唯讀執行）、Schema（探勘）四個分頁。
@@ -59,7 +57,14 @@ sqltrans/
 - 🛡️ **唯讀執行**：AST 政策 + 語句逾時 + 列數上限 + 分頁 + 連線池 + 結果快取。
 - 🔑 **具名連線**：`~/.sqltrans/connections.toml` 放 metadata，連線 URL 放環境變數（金鑰不落地）。
 
-### 安裝
+- 💻 **CLI (primary)**: `translate`, `nl2sql`, `run`, `schema`, `gui` subcommands — scriptable, pipe-friendly.
+- 🌐 **Web GUI**: Translate (paste-and-transpile), Ask (NL→SQL + feedback), Run (read-only execute), Schema (introspect) tabs.
+- 🔁 **Cross-dialect transpilation**: PostgreSQL, Oracle, MySQL, T-SQL, SQLite, Snowflake, BigQuery, DuckDB (sqlglot).
+- 🤖 **Natural-language → SQL**: Claude drafts; output is re-validated through the same read-only gate; per-dialect few-shot and a feedback loop.
+- 🛡️ **Read-only execution**: AST policy + statement timeout + row cap + paging + connection pool + result cache.
+- 🔑 **Named connections**: metadata in `~/.sqltrans/connections.toml`, URL in an environment variable (secrets never written to disk).
+
+## 安裝 / Installation
 
 ```bash
 # 從 PyPI
@@ -71,7 +76,7 @@ cd Claude-SQLTrans
 pip install -e .            # 含開發相依: pip install -e ".[dev]"
 ```
 
-### 快速開始
+## 快速開始 / Quick Start
 
 ```bash
 # 跨方言轉譯（Oracle → Postgres：NVL → COALESCE）
@@ -91,100 +96,9 @@ sqltrans schema --connection prod
 sqltrans gui
 ```
 
-### 文件
+## 文件 / Documentation
 
 - [系統設計](SYSTEM_DESIGN.md) · [開發指南](docs/development.md) · [快速開始](docs/quick-start.md) · [文件索引](docs/index.md)
-
----
-
-## English
-
-**SQLTrans** is a SQL tool for customer-support engineers — **transpile** SQL between dialects, **generate** SQL from natural language, and run **read-only** queries against a live database. Exposed through a CLI and a web GUI.
-
-### Architecture
-
-```mermaid
-flowchart TB
-    CLI[CLI<br/>sqltrans translate / nl2sql / run / schema / gui]
-    WEB[Web GUI<br/>FastAPI + vanilla JS<br/>Translate / Ask / Run / Schema]
-    API[FastAPI router<br/>/api/transpile · /api/nl2sql · /api/schema<br/>/api/query/execute · /api/connections]
-    SAFE[Read-only safety layer<br/>sqlglot AST policy · transpiler.py]
-    NL[NL→SQL · Claude · nl2sql.py<br/>per-dialect few-shot + feedback]
-    CONN[Connection manager<br/>named conns · env-var secrets · connections.py]
-    EXEC[Read-only executor<br/>timeouts · pool · paging · cache · executor.py]
-    INTRO[Schema introspection · introspection.py]
-    DB[(Live Database)]
-
-    CLI --> API
-    WEB --> API
-    API --> SAFE
-    API --> NL --> SAFE
-    API --> CONN --> EXEC --> SAFE
-    CONN --> INTRO
-    EXEC -.read-only.-> DB
-    INTRO -.metadata.-> DB
-```
-
-Every SQL string the system produces or runs is first gated by a **read-only safety policy enforced on the parsed AST** — writes, DDL, DCL, and multi-statement injection are all rejected before reaching the database.
-
-### Project Structure
-
-```
-sqltrans/
-├── src/sqltrans/            # engine, CLI, web, db, utils
-│   ├── sql/                 # transpiler.py (sqlglot + read-only), nl2sql.py
-│   ├── db/                  # introspection, executor, engine, connections
-│   ├── web/                 # FastAPI app + static web GUI
-│   ├── utils/               # config, logging
-│   └── __main__.py          # CLI entry point (translate/nl2sql/run/schema/gui)
-├── tests/                   # unit + integration + e2e
-├── docs/                    # documentation
-├── examples/                # example queries / scenarios
-└── pyproject.toml
-```
-
-### Features
-
-- 💻 **CLI (primary)**: `translate`, `nl2sql`, `run`, `schema`, `gui` subcommands — scriptable, pipe-friendly.
-- 🌐 **Web GUI**: Translate (paste-and-transpile), Ask (NL→SQL + feedback), Run (read-only execute), Schema (introspect) tabs.
-- 🔁 **Cross-dialect transpilation**: PostgreSQL, Oracle, MySQL, T-SQL, SQLite, Snowflake, BigQuery, DuckDB (sqlglot).
-- 🤖 **Natural-language → SQL**: Claude drafts; output is re-validated through the same read-only gate; per-dialect few-shot and a feedback loop.
-- 🛡️ **Read-only execution**: AST policy + statement timeout + row cap + paging + connection pool + result cache.
-- 🔑 **Named connections**: metadata in `~/.sqltrans/connections.toml`, URL in an environment variable (secrets never written to disk).
-
-### Installation
-
-```bash
-# From PyPI
-pip install sqltrans
-
-# Or from source
-git clone https://github.com/Galen-Chu/Claude-SQLTrans.git
-cd Claude-SQLTrans
-pip install -e .            # with dev deps: pip install -e ".[dev]"
-```
-
-### Quick Start
-
-```bash
-# Transpile across dialects (Oracle → Postgres: NVL → COALESCE)
-sqltrans translate --read oracle --write postgres -q "SELECT NVL(x, 0) FROM t"
-
-# Generate SQL from natural language (requires ANTHROPIC_API_KEY)
-sqltrans nl2sql "count active users grouped by plan" --dialect postgres
-
-# Run a read-only query against a named connection
-export SQLTRANS_CONN_PROD="postgresql+psycopg://ro_user:****@host/db"
-sqltrans run --connection prod -q "SELECT * FROM users LIMIT 10"
-
-# Introspect the schema
-sqltrans schema --connection prod
-
-# Launch the web GUI
-sqltrans gui
-```
-
-### Documentation
 
 - [System Design](SYSTEM_DESIGN.md) · [Development Guide](docs/development.md) · [Quick Start](docs/quick-start.md) · [Documentation Index](docs/index.md)
 
