@@ -30,7 +30,7 @@ pip install sqltrans
 ### From Source
 
 ```bash
-git clone https://github.com/sqltrans/sqltrans.git
+git clone https://github.com/Galen-Chu/Claude-SQLTrans.git
 cd sqltrans
 pip install -e .
 ```
@@ -105,7 +105,8 @@ See `.spec-workflow/specs/` for detailed specifications and roadmap.
 
 ## Documentation
 
-- **[Quick Start Guide](QUICK_START.md)** - Get started in 5 minutes
-- **[Tutorial](TUTORIAL.md)** - Step-by-step examples and exercises
-- **[Documentation Index](DOCUMENTATION_INDEX.md)** - Complete documentation overview
-- **[Visual Walkthrough](VISUAL_WALKTHROUGH.md)** - Screenshots and UI guide
+- **[Quick Start Guide](docs/quick-start.md)** - Get started in 5 minutes
+- **[Tutorial](docs/tutorial.md)** - Step-by-step examples and exercises
+- **[Documentation Index](docs/index.md)** - Complete documentation overview
+- **[Visual Walkthrough](docs/visual-walkthrough.md)** - Screenshots and UI guide
+- **[System Design](SYSTEM_DESIGN.md)** - Architecture and technical design

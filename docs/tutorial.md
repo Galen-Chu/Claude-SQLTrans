@@ -711,14 +711,14 @@ Click [Save] button and save to file
 
 ### 1. Read the Full User Guide
 ```
-docs/user-guide.md
+user-guide.md
 ```
 Comprehensive guide with all features
 
 ### 2. Check Example Queries
 ```
-examples/sample_queries.md      - 30+ example queries
-examples/support_scenarios.md   - Real-world scenarios
+../examples/sample_queries.md      - 30+ example queries
+../examples/support_scenarios.md   - Real-world scenarios
 ```
 
 ### 3. Try Real Scenarios

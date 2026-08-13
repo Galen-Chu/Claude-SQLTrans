@@ -242,11 +242,11 @@ Filter 2: total > 100
 ## Need More Help?
 
 **Full Tutorial:**
-- `TUTORIAL.md` - Detailed step-by-step guide
+- [Tutorial](tutorial.md) - Detailed step-by-step guide
 
 **Documentation:**
-- `docs/user-guide.md` - Complete user manual
-- `examples/sample_queries.md` - 30+ examples
+- [User Guide](user-guide.md) - Complete user manual
+- [Sample Queries](../examples/sample_queries.md) - 30+ examples
 
 **In the app:**
 - Press `?` for help screen
