@@ -1,4 +1,24 @@
-# SQLTrans
+# Claude-SQLTrans
+
+**跨方言 SQL 轉譯 · 自然語言生成 · 唯讀執行**
+**Cross-dialect SQL transpilation · natural-language to SQL · read-only execution**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Python](https://img.shields.io/badge/Python-%3E%3D3.10-blue.svg)](https://www.python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104%2B-009688.svg)](https://fastapi.tiangolo.com)
+[![sqlglot](https://img.shields.io/badge/sqlglot-25%2B-f3772b.svg)](https://github.com/tobymao/sqlglot)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-d71a14.svg)](https://www.sqlalchemy.org)
+[![Claude](https://img.shields.io/badge/Claude-Opus%205-7d4eed.svg)](https://www.anthropic.com)
+[![Tests](https://img.shields.io/badge/tests-93%20passed-brightgreen.svg)](./tests)
+
+[Architecture](#架構--architecture) · [Project Structure](#專案結構--project-structure) · [Features](#功能--features) · [Installation](#安裝--installation) · [Quick Start](#快速開始--quick-start) · [Documentation](#文件--documentation)
+
+---
+
+> **🌐 語言 / Language:** 本文件為繁體中文／英文雙語版本，每個段落皆提供兩種語言。
+> This README is bilingual (Traditional Chinese / English); each section is provided in both languages.
+
+---
 
 **SQLTrans** 是一套給客服支援工程師的 SQL 工具——把 SQL **轉譯**到不同資料庫方言、用**自然語言生成** SQL，並對即時資料庫執行**唯讀**查詢。提供 CLI 與網頁 GUI 兩種介面。
 
