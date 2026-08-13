@@ -11,7 +11,7 @@
 [![Claude](https://img.shields.io/badge/Claude-Opus%205-7d4eed.svg)](https://www.anthropic.com)
 [![Tests](https://img.shields.io/badge/tests-93%20passed-brightgreen.svg)](./tests)
 
-[Features](#功能特色--features) · [Architecture](#系統架構--architecture) · [Project Structure](#專案結構--project-structure) · [Installation](#安裝--installation) · [Quick Start](#快速開始--quick-start) · [Documentation](#文件--documentation) · [Tech Stack](#技術櫛--tech-stack) · [License](#授權--license)
+[Features](#功能特色--features) · [Architecture](#系統架構--architecture) · [Project Structure](#專案結構--project-structure) · [Installation](#安裝--installation) · [Quick Start](#快速開始--quick-start) · [Documentation](#文件--documentation) · [Tech Stack](#技術棧--tech-stack) · [License](#授權--license)
 
 ---
 
@@ -122,7 +122,7 @@ sqltrans gui
 
 - [System Design](SYSTEM_DESIGN.md) · [Development Guide](docs/development.md) · [Quick Start](docs/quick-start.md) · [Documentation Index](docs/index.md)
 
-## 技術櫛 / Tech Stack
+## 技術棧 / Tech Stack
 
 - **Python 3.10+** — runtime
 - **[sqlglot](https://github.com/tobymao/sqlglot)** — SQL parsing + cross-dialect transpilation
