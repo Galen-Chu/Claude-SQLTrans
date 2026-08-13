@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sqltrans"
-version = "0.1.0"
-description = "Interactive SQL query builder for customer support engineers"
+version = "0.2.0"
+description = "Translate, generate, and run read-only SQL for customer-support engineers"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
     {name = "SQLTrans Team"}
 ]
-keywords = ["sql", "query-builder", "cli", "tui", "database", "support"]
+keywords = ["sql", "transpile", "nl2sql", "sqlglot", "cli", "database", "support", "anthropic"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -56,15 +56,15 @@ dev = [
 sqltrans = "sqltrans.__main__:main"
 
 [project.urls]
-Homepage = "https://github.com/sqltrans/sqltrans"
-Repository = "https://github.com/sqltrans/sqltrans"
-Issues = "https://github.com/sqltrans/sqltrans/issues"
+Homepage = "https://github.com/Galen-Chu/Claude-SQLTrans"
+Repository = "https://github.com/Galen-Chu/Claude-SQLTrans"
+Issues = "https://github.com/Galen-Chu/Claude-SQLTrans/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-sqltrans = ["config/*.toml"]
+sqltrans = ["config/*.toml", "web/static/*", "web/static/js/*", "web/static/css/*", "web/static/lib/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
