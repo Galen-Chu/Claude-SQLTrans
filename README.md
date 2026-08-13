@@ -11,7 +11,7 @@
 [![Claude](https://img.shields.io/badge/Claude-Opus%205-7d4eed.svg)](https://www.anthropic.com)
 [![Tests](https://img.shields.io/badge/tests-93%20passed-brightgreen.svg)](./tests)
 
-[Architecture](#架構--architecture) · [Project Structure](#專案結構--project-structure) · [Features](#功能--features) · [Installation](#安裝--installation) · [Quick Start](#快速開始--quick-start) · [Documentation](#文件--documentation)
+[Features](#功能特色--features) · [Architecture](#系統架構--architecture) · [Project Structure](#專案結構--project-structure) · [Installation](#安裝--installation) · [Quick Start](#快速開始--quick-start) · [Documentation](#文件--documentation) · [Tech Stack](#技術櫛--tech-stack) · [License](#授權--license)
 
 ---
 
@@ -24,7 +24,23 @@
 
 **SQLTrans** is a SQL tool for customer-support engineers — **transpile** SQL between dialects, **generate** SQL from natural language, and run **read-only** queries against a live database. Exposed through a CLI and a web GUI.
 
-## 架構 / Architecture
+## 功能特色 / Features
+
+- 💻 **CLI（主力）**：`translate`、`nl2sql`、`run`、`schema`、`gui` 子指令，可腳本化、可管線。
+- 🌐 **網頁 GUI**：Translate（貼上 SQL 轉譯）、Ask（自然語言生成 + 回饋）、Run（唯讀執行）、Schema（探勘）四個分頁。
+- 🔁 **跨方言轉譯**：PostgreSQL、Oracle、MySQL、T-SQL、SQLite、Snowflake、BigQuery、DuckDB（sqlglot）。
+- 🤖 **自然語言 → SQL**：Claude 生成，輸出再經同一道唯讀閘道驗證；支援各方言 few-shot 與回饋迴圈。
+- 🛡️ **唯讀執行**：AST 政策 + 語句逾時 + 列數上限 + 分頁 + 連線池 + 結果快取。
+- 🔑 **具名連線**：`~/.sqltrans/connections.toml` 放 metadata，連線 URL 放環境變數（金鑰不落地）。
+
+- 💻 **CLI (primary)**: `translate`, `nl2sql`, `run`, `schema`, `gui` subcommands — scriptable, pipe-friendly.
+- 🌐 **Web GUI**: Translate (paste-and-transpile), Ask (NL→SQL + feedback), Run (read-only execute), Schema (introspect) tabs.
+- 🔁 **Cross-dialect transpilation**: PostgreSQL, Oracle, MySQL, T-SQL, SQLite, Snowflake, BigQuery, DuckDB (sqlglot).
+- 🤖 **Natural-language → SQL**: Claude drafts; output is re-validated through the same read-only gate; per-dialect few-shot and a feedback loop.
+- 🛡️ **Read-only execution**: AST policy + statement timeout + row cap + paging + connection pool + result cache.
+- 🔑 **Named connections**: metadata in `~/.sqltrans/connections.toml`, URL in an environment variable (secrets never written to disk).
+
+## 系統架構 / Architecture
 
 ```mermaid
 flowchart TB
@@ -68,22 +84,6 @@ sqltrans/
 └── pyproject.toml
 ```
 
-## 功能 / Features
-
-- 💻 **CLI（主力）**：`translate`、`nl2sql`、`run`、`schema`、`gui` 子指令，可腳本化、可管線。
-- 🌐 **網頁 GUI**：Translate（貼上 SQL 轉譯）、Ask（自然語言生成 + 回饋）、Run（唯讀執行）、Schema（探勘）四個分頁。
-- 🔁 **跨方言轉譯**：PostgreSQL、Oracle、MySQL、T-SQL、SQLite、Snowflake、BigQuery、DuckDB（sqlglot）。
-- 🤖 **自然語言 → SQL**：Claude 生成，輸出再經同一道唯讀閘道驗證；支援各方言 few-shot 與回饋迴圈。
-- 🛡️ **唯讀執行**：AST 政策 + 語句逾時 + 列數上限 + 分頁 + 連線池 + 結果快取。
-- 🔑 **具名連線**：`~/.sqltrans/connections.toml` 放 metadata，連線 URL 放環境變數（金鑰不落地）。
-
-- 💻 **CLI (primary)**: `translate`, `nl2sql`, `run`, `schema`, `gui` subcommands — scriptable, pipe-friendly.
-- 🌐 **Web GUI**: Translate (paste-and-transpile), Ask (NL→SQL + feedback), Run (read-only execute), Schema (introspect) tabs.
-- 🔁 **Cross-dialect transpilation**: PostgreSQL, Oracle, MySQL, T-SQL, SQLite, Snowflake, BigQuery, DuckDB (sqlglot).
-- 🤖 **Natural-language → SQL**: Claude drafts; output is re-validated through the same read-only gate; per-dialect few-shot and a feedback loop.
-- 🛡️ **Read-only execution**: AST policy + statement timeout + row cap + paging + connection pool + result cache.
-- 🔑 **Named connections**: metadata in `~/.sqltrans/connections.toml`, URL in an environment variable (secrets never written to disk).
-
 ## 安裝 / Installation
 
 ```bash
@@ -122,6 +122,21 @@ sqltrans gui
 
 - [System Design](SYSTEM_DESIGN.md) · [Development Guide](docs/development.md) · [Quick Start](docs/quick-start.md) · [Documentation Index](docs/index.md)
 
+## 技術櫛 / Tech Stack
+
+- **Python 3.10+** — runtime
+- **[sqlglot](https://github.com/tobymao/sqlglot)** — SQL parsing + cross-dialect transpilation
+- **[SQLAlchemy 2.x](https://www.sqlalchemy.org)** — schema introspection + read-only execution
+- **[FastAPI](https://fastapi.tiangolo.com)** + **[Uvicorn](https://uvicorn.org)** — web API + GUI server
+- **[Anthropic Claude](https://www.anthropic.com)** (`claude-opus-5`) — natural-language to SQL
+- **[Rich](https://rich.readthedocs.io)** — highlighted CLI output (SQL + result tables)
+
+## 授權 / License
+
+本專案採 MIT 授權。
+Released under the **MIT License** — see [LICENSE](LICENSE).
+Copyright (c) 2026 SQLTrans Team.
+
 ## 👤 作者 / Author
 
 **Galen-Chu**
@@ -130,4 +145,3 @@ sqltrans gui
 
 
 Made with ❤️ for API testing · 用 ❤️ 為 API 測試而造
-
