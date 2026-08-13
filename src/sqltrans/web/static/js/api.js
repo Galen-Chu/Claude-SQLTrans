@@ -1,132 +1,78 @@
 /**
- * API Client for SQLTrans Backend
- * Handles all HTTP requests to the FastAPI backend
+ * API Client for the SQLTrans v2 backend.
+ * Wraps the Translate / Ask / Run / Schema + connection + feedback endpoints.
  */
-
 class APIClient {
-    constructor(baseURL = '/api') {
+    constructor(baseURL = "/api") {
         this.baseURL = baseURL;
     }
 
-    /**
-     * Generic request handler
-     * @param {string} endpoint - API endpoint path
-     * @param {object} options - Fetch options
-     * @returns {Promise<any>} Response data
-     */
     async request(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            },
-            ...options,
-        };
-
-        try {
-            const response = await fetch(url, config);
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || data.error || 'Request failed');
-            }
-
-            return data;
-        } catch (error) {
-            console.error(`API Error [${endpoint}]:`, error);
-            throw error;
+        const config = { headers: { "Content-Type": "application/json", ...options.headers }, ...options };
+        const response = await fetch(url, config);
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data.detail || data.error || `Request failed (${response.status})`);
         }
+        return data;
     }
 
-    /**
-     * Get current query state
-     */
-    async getQueryState() {
-        return this.request('/query');
+    listConnections() {
+        return this.request("/connections");
     }
 
-    /**
-     * Set table name
-     */
-    async setTable(name) {
-        return this.request('/query/table', {
-            method: 'POST',
-            body: JSON.stringify({ name }),
+    listDialects() {
+        return this.request("/transpile/dialects").then((d) => d.dialects);
+    }
+
+    transpile({ sql, read, write, pretty = true }) {
+        return this.request("/transpile", {
+            method: "POST",
+            body: JSON.stringify({ sql, read: read || null, write: write || null, pretty }),
         });
     }
 
-    /**
-     * Add a column
-     */
-    async addColumn(column) {
-        return this.request('/query/columns/add', {
-            method: 'POST',
-            body: JSON.stringify({ column }),
+    nl2sql({ prompt, dialect, connection_name, model, transpile_to }) {
+        return this.request("/nl2sql", {
+            method: "POST",
+            body: JSON.stringify({
+                prompt,
+                dialect: dialect || null,
+                connection_name: connection_name || null,
+                model: model || null,
+                transpile_to: transpile_to || null,
+            }),
         });
     }
 
-    /**
-     * Remove a column
-     */
-    async removeColumn(column) {
-        return this.request(`/query/columns/${encodeURIComponent(column)}`, {
-            method: 'DELETE',
+    feedback(payload) {
+        return this.request("/nl2sql/feedback", {
+            method: "POST",
+            body: JSON.stringify(payload),
         });
     }
 
-    /**
-     * Add a filter
-     */
-    async addFilter(column, operator, value) {
-        return this.request('/query/filters/add', {
-            method: 'POST',
-            body: JSON.stringify({ column, operator, value }),
+    schema({ connection_name, connection, schema }) {
+        const params = new URLSearchParams();
+        if (connection_name) params.set("connection_name", connection_name);
+        if (connection) params.set("connection", connection);
+        if (schema) params.set("schema", schema);
+        return this.request(`/schema?${params.toString()}`);
+    }
+
+    execute({ sql, connection_name, connection, dialect, row_limit }) {
+        return this.request("/query/execute", {
+            method: "POST",
+            body: JSON.stringify({
+                sql,
+                connection_name: connection_name || null,
+                connection: connection || null,
+                dialect: dialect || null,
+                row_limit: row_limit || null,
+            }),
         });
-    }
-
-    /**
-     * Remove a filter by index
-     */
-    async removeFilter(index) {
-        return this.request(`/query/filters/${index}`, {
-            method: 'DELETE',
-        });
-    }
-
-    /**
-     * Change SQL dialect
-     */
-    async setDialect(dialect) {
-        return this.request('/query/dialect', {
-            method: 'POST',
-            body: JSON.stringify({ dialect }),
-        });
-    }
-
-    /**
-     * Clear entire query
-     */
-    async clearQuery() {
-        return this.request('/query/clear', {
-            method: 'POST',
-        });
-    }
-
-    /**
-     * Get generated SQL
-     */
-    async getSQL() {
-        return this.request('/query/sql');
-    }
-
-    /**
-     * Get available dialects
-     */
-    async getDialects() {
-        return this.request('/dialects');
     }
 }
 
-// Create and export global API client instance
 window.api = new APIClient();

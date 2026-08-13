@@ -67,12 +67,7 @@ def launch_web_gui(initial_dialect: str = "generic", port: Optional[int] = None)
         port: Port number to use (None = auto-find)
     """
     logger.info("Starting SQLTrans Web GUI")
-
-    # Set initial dialect in the app
-    from sqltrans.web.app import query_state
-
-    query_state.set_dialect(initial_dialect)
-    logger.info(f"Initial dialect set to: {initial_dialect}")
+    logger.info(f"Initial dialect: {initial_dialect}")
 
     # Find available port
     if port is None:
