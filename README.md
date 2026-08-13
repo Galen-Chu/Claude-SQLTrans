@@ -133,8 +133,11 @@ sqltrans gui
 
 ## 授權 / License
 
-本專案採 MIT 授權。
-Released under the **MIT License** — see [LICENSE](LICENSE).
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+本專案採 [MIT 授權](https://opensource.org/licenses/MIT)。
+Released under the [MIT License](https://opensource.org/licenses/MIT) — see [LICENSE](LICENSE).
+
 Copyright (c) 2026 SQLTrans Team.
 
 ## 👤 作者 / Author
