@@ -24,6 +24,8 @@
 
 **SQLTrans** is a SQL tool for customer-support engineers — **transpile** SQL between dialects, **generate** SQL from natural language, and run **read-only** queries against a live database. Exposed through a CLI and a web GUI.
 
+---
+
 ## ✨ 功能特色 / Features
 
 - 💻 **CLI（主力）**：`translate`、`nl2sql`、`run`、`schema`、`gui` 子指令，可腳本化、可管線。
@@ -39,6 +41,8 @@
 - 🤖 **Natural-language → SQL**: Claude drafts; output is re-validated through the same read-only gate; per-dialect few-shot and a feedback loop.
 - 🛡️ **Read-only execution**: AST policy + statement timeout + row cap + paging + connection pool + result cache.
 - 🔑 **Named connections**: metadata in `~/.sqltrans/connections.toml`, URL in an environment variable (secrets never written to disk).
+
+---
 
 ## 🏛️ 系統架構 / Architecture
 
@@ -68,6 +72,8 @@ flowchart TB
 
 Every SQL string the system produces or runs is first gated by a **read-only safety policy enforced on the parsed AST** — writes, DDL, DCL, and multi-statement injection are all rejected before reaching the database.
 
+---
+
 ## 📁 專案結構 / Project Structure
 
 ```
@@ -84,6 +90,8 @@ sqltrans/
 └── pyproject.toml
 ```
 
+---
+
 ## 📦 安裝 / Installation
 
 ```bash
@@ -95,6 +103,8 @@ git clone https://github.com/Galen-Chu/Claude-SQLTrans.git
 cd Claude-SQLTrans
 pip install -e .            # 含開發相依: pip install -e ".[dev]"
 ```
+
+---
 
 ## 🚀 快速開始 / Quick Start
 
@@ -116,11 +126,15 @@ sqltrans schema --connection prod
 sqltrans gui
 ```
 
+---
+
 ## 📚 文件 / Documentation
 
 - [系統設計](SYSTEM_DESIGN.md) · [開發指南](docs/development.md) · [快速開始](docs/quick-start.md) · [文件索引](docs/index.md)
 
 - [System Design](SYSTEM_DESIGN.md) · [Development Guide](docs/development.md) · [Quick Start](docs/quick-start.md) · [Documentation Index](docs/index.md)
+
+---
 
 ## 🧰 技術棧 / Tech Stack
 
@@ -131,6 +145,8 @@ sqltrans gui
 - **[Anthropic Claude](https://www.anthropic.com)** (`claude-opus-5`) — natural-language to SQL
 - **[Rich](https://rich.readthedocs.io)** — highlighted CLI output (SQL + result tables)
 
+---
+
 ## 📄 授權 / License
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
@@ -140,11 +156,11 @@ Released under the [MIT License](https://opensource.org/licenses/MIT) — see [L
 
 Copyright (c) 2026 SQLTrans Team.
 
+---
+
 ## 👤 作者 / Author
 
 **Galen-Chu**
 
 ---
-
-
-Made with ❤️ for API testing · 用 ❤️ 為 API 測試而造
+**Updated:** 2026-08-14
